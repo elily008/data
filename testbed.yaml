@@ -1,0 +1,6 @@
+sut: 127.0.0.1
+sut_home: /root
+sut_user: root
+sut_name: sut
+fwd: linux
+

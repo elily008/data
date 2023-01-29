@@ -1,0 +1,6 @@
+- experiment: end_b6_encaps
+  rate: pdr
+  run: 20
+  size: min
+  type: srv6
+
