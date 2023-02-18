@@ -8,6 +8,7 @@ import sys
 from NoDropRateSolver import *
 from TrexPerf import TrexExperimentFactory
 from config_parser import ConfigParser
+import json
 
 # Trex server
 TREX_SERVER = "127.0.0.1"
@@ -16,15 +17,15 @@ TX_PORT = 0
 # RX port
 RX_PORT = 1
 # Duration of a single RUN (time to get a sample)
-DURATION = 10
+DURATION = 2
 # pcap location
-PCAP_HOME = "./pcap/trex-pcap-files"
+PCAP_HOME = "./pcap"
 # Define the namber of samples for a given PDR
 SAMPLES = 1
 # Starting tx rate
 STARTING_TX_RATE = 1000.
 # NDR window
-NDR_WINDOW = 500.0
+NDR_WINDOW = 100.0
 # Lower bound for delivery ratio
 LB_DLR = 0.995
 
@@ -46,6 +47,7 @@ class PDR(object):
                              RateType.PPS, factory)
       ndr.solve()
       # Once finished let's collect the results
-      results.append(ndr.getSW()[0])
+      sw = ndr.getSW()
+      results.append(sw[0])
     return results
 

@@ -70,10 +70,8 @@ class TrexOutput():
 
     def getRxPort(self, rxPort):
         return self.output['rx']['port']
-
     def getTxTotalPackets(self):
         return self.output['tx']['total_packets']
-
     def getRxTotalPackets(self):
         return self.output['rx']['total_packets']
 
@@ -91,6 +89,16 @@ class TrexOutput():
 
     def toString(self):
         return str(self.output)
+
+    def getRxTotalBytes(self):
+        return self.output['rx']['rx_bps']
+    def getTxTotalBytes(self):
+        return self.output['tx']['tx_bps']
+    def setTxTotalBytes(self, bps):
+        self.output['tx']['tx_bps'] = bps
+    def setRxTotalBytes(self, bps):
+        self.output['rx']['rx_bps'] = bps
+
 
 class TrexDriver():
 
@@ -162,11 +170,14 @@ class TrexDriver():
             sleep(1)
 
             # We retrieve statistics from Tx and Rx ports.
-            txStats = client.get_xstats(self.txPort)
-            rxStats = client.get_xstats(self.rxPort)
+            txStats = client.get_stats(self.txPort)
+            rxStats = client.get_stats(self.rxPort)
 
-            tOutput.setTxTotalPackets(txStats['tx_good_packets'])
-            tOutput.setRxTotalPackets(rxStats['rx_good_packets'])
+            tOutput.setTxTotalBytes(txStats['total']['obytes'])
+            tOutput.setRxTotalBytes(txStats['total']['ibytes'])
+
+            tOutput.setTxTotalPackets(txStats['total']['opackets'])
+            tOutput.setRxTotalPackets(rxStats['total']['ipackets'])
 
         except STLError as e:
             print(e)
@@ -180,7 +191,7 @@ class TrexDriver():
 # Entry point used for testing
 if __name__ == '__main__':
 
-    driver = TrexDriver('127.0.0.1', 0, 1, './pcap/trex-pcap-files/plain-ipv6-64.pcap', '100%', 10)
+    driver = TrexDriver('127.0.0.1', 0, 1, './pcap/trex-pcap-files/plain-ipv6-64.pcap', '50%', 1)
     output = driver.run()
     print(output.toString())
 

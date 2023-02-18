@@ -1,6 +1,7 @@
 
 import math
 import sys, traceback
+import json
 
 from enum import Enum
 
@@ -122,6 +123,10 @@ class NoDropRateSolver:
                       '<probed:{4:f}/DR:{5:f}>, Threshold:{6:f}'.
                       format(tuple[0], tuple[1], tuple[2], tuple[3], tuple[4],
                              tuple[5], tuple[6]))
+
+        with open('sample.txt', 'a') as file:
+            file.write(json.dumps(self.results))
+
 
     def solve(self):
         print("Solver started...")

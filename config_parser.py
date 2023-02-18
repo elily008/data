@@ -8,9 +8,9 @@ from collections import namedtuple
 
 #Line rate mapping - WARNING Some values are random
 LINE_RATES = {
-  'ipv6':1225300,
+  'ipv6':122530,
   'ipv4':12253000,
-  't_encaps_v6':1225300,
+  't_encaps_v6':122530,
   't_encaps_v4':12253000,
   't_encaps_l2':12253000,
   't_insert_v6':12253000,
@@ -25,7 +25,11 @@ LINE_RATES = {
   'end_dt6':6377000,
   'end_ad6':6377000,
   'end_ad4':6377000,
-  'end_am':6377000
+  'end_am':6377000,
+  '2-3': 100000,
+  '256': 100000,
+  '512': 100000,
+  '1024': 100000
 }
 
 # Config utilities

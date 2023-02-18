@@ -9,12 +9,16 @@ from abc import ABC
 
 class TrexPerfOutput(ExperimentOutput):
 
-    def __init__(self, runs, reqRate, mean, std):
+    def __init__(self, runs, reqRate, mean, std, olmean, ilmean, opmean, ipmean):
         self.output = {}
 
         self.output['dl_mean'] = mean
         self.output['dl_std'] = std
         self.output['requested_tx_rate'] = reqRate
+        self.output['ol_mean'] = olmean
+        self.output['il_mean'] = ilmean
+        self.output['op_mean'] = opmean
+        self.output['ip_mean'] = ipmean
 
         self.runs = runs
 
@@ -26,7 +30,19 @@ class TrexPerfOutput(ExperimentOutput):
 
     def getAverageDR(self):
         return self.output['dl_mean']
+    def getAverageOlMean(self):
+        return self.output['ol_mean']
+    def getAverageIlMean(self):
+        return self.output['il_mean']
+    def getAverageIpMean(self):
+        return self.output['ip_mean']
+    def getAverageOpMean(self):
+        return self.output['op_mean']
 
+ 
+ 
+ 
+ 
     def getStdDR(self):
         return self.output['dl_std']
 
@@ -73,7 +89,7 @@ class TrexPerfDriver():
         for i in range(1 + self.repetitions):
             output = driver.run()
             if output is None:
-                print('Driver returns an invalid result. Please check your SUT configuration.')
+                print('Driver returns Gan invalid result. Please check your SUT configuration.')
                 sys.exit(1)
 
             if i > 0:
@@ -98,6 +114,10 @@ class TrexPerfDriver():
 
         # We create a numpy array in order to store checked and validate data
         dlRuns = np.array([])
+        olRuns = np.array([])
+        ilRuns = np.array([])
+        opRuns = np.array([])
+        ipRuns = np.array([])
 
         # We process each single result
         for i in range(len(results)):
@@ -133,6 +153,10 @@ class TrexPerfDriver():
                 # We evaluate DR
                 dl = rxTotalPackets / (1.0 * txTotalPackets)
                 dlRuns = np.append(dlRuns, dl)
+                olRuns = np.append(olRuns, run.getTxTotalBytes())
+                ilRuns = np.append(ilRuns, run.getRxTotalBytes())
+                opRuns = np.append(opRuns, run.getTxTotalPackets())
+                ipRuns = np.append(ipRuns, run.getRxTotalPackets())
 
                 # We set the requested tx rate only the first time (using the first
                 # run in the experiment; following runs will have the same 
@@ -150,6 +174,10 @@ class TrexPerfDriver():
 
         # We evaluate mean and std of delivery ratios
         dlMean = np.mean(dlRuns)
+        olMean = np.mean(olRuns)
+        ilMean = np.mean(ilRuns)
+        opMean = np.mean(opRuns)
+        ipMean = np.mean(ipRuns)
 
         if 1 < dlRuns.size: 
             dlStd = np.std(dlRuns, ddof=1)
@@ -157,7 +185,7 @@ class TrexPerfDriver():
             dlStd = 0
 
         # We build the object wrapper
-        output = TrexPerfOutput(results, txRate, dlMean, dlStd)
+        output = TrexPerfOutput(results, txRate, dlMean, dlStd, olMean, ilMean,opMean, ipMean)
         return output
 
     # Run is reentrant and it can be called multiple times without creating
@@ -214,22 +242,26 @@ class TrexExperimentFactory(ExperimentFactory):
 
 # Entry point used for testing
 if __name__ == '__main__':
+    #factory = TrexExperimentFactory('127.0.0.1', 0, 1, 
+                                    #'./pcap/trex-pcap-files/srv6-end_b6_encaps-64.pcap', 
+    #                                10, 20)
+
+    duration = 10 
     factory = TrexExperimentFactory('127.0.0.1', 0, 1, 
-                                    './pcap/trex-pcap-files/plain-ipv6-64.pcap', 
-                                    1, 5)
-    print ('Running ...')
+                                    './pcap/128-2-3-64.pcap', 
+                                    10, duration)
 
-    experiment = factory.build('1000000')
-    output = experiment.run()
-    if output is None:
-        print('Error, experiment cannot return an empty value.')
-        sys.exit(1)
+    for i in range(1000, 100000, 5000):
+    #for i in range(10, 20, 1):
+        experiment = factory.build(str(i))
+        output = experiment.run()
+        if output is None:
+            print('Error, experiment cannot return an empty value.')
+            sys.exit(1)
 
-    print('Requested Tx Rate {0}, Mean {1}, Std. {2}'.format(
-                                                 output.getRequestedTxRate(), 
-                                                 output.getAverageDR(), 
-                                                 output.getStdDR()))
-    
-    print ('Completed ...')
+        #print('Requested Tx Rate {0}, Mean {1}, Std. {2}'.format(
+        #                                             output.getRequestedTxRate(), 
+        #                                             output.getAverageDR(), 
+        #                                             output.getStdDR()))
 
-
+        print(output.getAverageOlMean()/duration, ", ", output.getAverageIlMean()/duration, ", ", output.getAverageOpMean()/duration,",", output.getAverageIpMean()/duration,",",output.getAverageDR(),",",  output.getStdDR())
