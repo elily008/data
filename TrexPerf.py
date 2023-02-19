@@ -248,7 +248,7 @@ if __name__ == '__main__':
 
     duration = 10 
     factory = TrexExperimentFactory('127.0.0.1', 0, 1, 
-                                    './pcap/128-2-3-64.pcap', 
+                                    './pcap/512-2-3-64.pcap', 
                                     10, duration)
 
     for i in range(1000, 100000, 5000):
